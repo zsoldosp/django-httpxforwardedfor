@@ -10,26 +10,7 @@ from django.utils import unittest
 from paessler.httpxforwardedfor.middleware import HttpXForwardedForMiddleware
 
 
-class MiddlewareTestCase(object):
-
-    def setUp(self):
-        super(MiddlewareTestCase, self).setUp()
-        self.client = Client()
-
-    def _create_request(self, path):
-        request = HttpRequest()
-        request.META = {
-            'SERVER_NAME': 'testserver',
-            'SERVER_PORT': 80,
-        }
-        request.path = request.path_info = path
-        return request
-
-    def get_middleware_from_decorated_view(self, decorated_view):
-        return decorated_view.func_closure[0].cell_contents.__class__
-
-
-class XForwardedMiddlewareTestCase(MiddlewareTestCase, unittest.TestCase):
+class HttpXForwardedForMiddlewareTestCase(unittest.TestCase):
 
     @override_settings(TRUSTED_PROXY_IPS=["1.1.1.1"])
     def test_x_forwarded_for_header_overrides_remote_addr(self):
@@ -103,6 +84,8 @@ class XForwardedMiddlewareTestCase(MiddlewareTestCase, unittest.TestCase):
         request, response = self.create_request_and_response()
         self.assertFalse(request.is_secure())
 
+    #####
+
     def process_request_and_get_resulting_remote_addr(self, **meta):
         request, response = self.create_request_and_response()
 
@@ -110,15 +93,25 @@ class XForwardedMiddlewareTestCase(MiddlewareTestCase, unittest.TestCase):
         HttpXForwardedForMiddleware().process_request(request)
         return request.META["REMOTE_ADDR"]
 
-    def create_request_and_response(self, data=None, path=None):
+    def create_request_and_response(self, data=None, path=None, client=None):
+        client = client or Client()
         path = path or "/"
         data = data or dict()
         request = self._create_request(path)
-        response = self.client.get(path, data=data)
+        response = client.get(path, data=data)
         return request, response
 
+    def _create_request(self, path):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        request.path = request.path_info = path
+        return request
 
-class XForwardedForMiddlewareIntegrationTestCase(MiddlewareTestCase, unittest.TestCase):
+
+class HttpXForwardedForMiddlewareIntegrationTestCase(unittest.TestCase):
 
     def test__middleware_is_installed(self):
         middleware_name = "paessler.httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
