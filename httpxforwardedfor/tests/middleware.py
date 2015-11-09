@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from hamcrest import assert_that, is_in
 
 from django.conf import settings
 from django.http import HttpRequest
@@ -26,10 +27,6 @@ class MiddlewareTestCase(object):
 
     def get_middleware_from_decorated_view(self, decorated_view):
         return decorated_view.func_closure[0].cell_contents.__class__
-
-    @staticmethod
-    def assert_contains(haystack, needle):
-        assert needle in haystack, "Could not find '%s' in '%s'" % (needle, haystack)
 
 
 class XForwardedMiddlewareTestCase(MiddlewareTestCase, unittest.TestCase):
@@ -125,7 +122,7 @@ class XForwardedForMiddlewareIntegrationTestCase(MiddlewareTestCase, unittest.Te
 
     def test__middleware_is_installed(self):
         middleware_name = "paessler.httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
-        self.assert_contains(settings.MIDDLEWARE_CLASSES, middleware_name)
+        assert_that(middleware_name, is_in(settings.MIDDLEWARE_CLASSES))
 
     def test__middleware_is_installed_before_all_other_middlewares_that_use_remote_addr(self):
         middleware_name = "paessler.httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
