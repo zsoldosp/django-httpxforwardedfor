@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.utils import unittest
 
 from django.conf import settings
 from django.http import HttpRequest
 from django.test.client import Client
+from django.test.utils import override_settings
+from django.utils import unittest
 
 from paessler.httpxforwardedfor.middleware import HttpXForwardedForMiddleware
 
@@ -33,71 +34,63 @@ class MiddlewareTestCase(object):
 
 class XForwardedMiddlewareTestCase(MiddlewareTestCase, unittest.TestCase):
 
-    def setUp(self):
-        super(XForwardedMiddlewareTestCase, self).setUp()
-        self.retained_trusted_proxies = settings.TRUSTED_PROXY_IPS
-
-    def tearDown(self):
-        super(XForwardedMiddlewareTestCase, self).tearDown()
-        settings.TRUSTED_PROXY_IPS = self.retained_trusted_proxies
-
+    @override_settings(TRUSTED_PROXY_IPS=["1.1.1.1"])
     def test_x_forwarded_for_header_overrides_remote_addr(self):
-        settings.TRUSTED_PROXY_IPS = ["1.1.1.1"]
         self.assertEquals("1.2.3.4", self.process_request_and_get_resulting_remote_addr(
             REMOTE_ADDR="1.1.1.1",
             HTTP_X_FORWARDED_FOR="1.2.3.4",
         ))
 
+    @override_settings(TRUSTED_PROXY_IPS=["1.1.1.1"])
     def test_x_forwarded_for_header_overrides_remote_addr__multiple_ips_in_header(self):
-        settings.TRUSTED_PROXY_IPS = ["1.1.1.1"]
         self.assertEquals("2.2.2.2", self.process_request_and_get_resulting_remote_addr(
             REMOTE_ADDR="1.1.1.1",
             HTTP_X_FORWARDED_FOR="2.2.2.2, 3.3.3.3"
         ))
 
+    @override_settings(TRUSTED_PROXY_IPS=["2.2.2.2"])
     def test_x_forwarded_for_header_does_not_override_remote_addr_when_not_among_trusted_proxy_ips(self):
-        settings.TRUSTED_PROXY_IPS = ["2.2.2.2"]
         self.assertEquals("1.1.1.1", self.process_request_and_get_resulting_remote_addr(
             REMOTE_ADDR="1.1.1.1",
             HTTP_X_FORWARDED_FOR="4.4.4.4"
         ))
 
+    @override_settings(TRUSTED_PROXY_IPS=["1.0/16"])
     def test_x_forwarded_for_header_overrides_remote_addr__iprange(self):
-        settings.TRUSTED_PROXY_IPS = ["1.0/16"]
         self.assertEquals("2.2.2.2", self.process_request_and_get_resulting_remote_addr(
             REMOTE_ADDR="1.0.1.1",
             HTTP_X_FORWARDED_FOR="2.2.2.2"
         ))
 
+    @override_settings(TRUSTED_PROXY_IPS=["1.0/16"])
     def test_x_forwarded_for_header_overrides_remote_addr__multiple_ips_in_header__iprange(self):
-        settings.TRUSTED_PROXY_IPS = ["1.0/16"]
         self.assertEquals("2.2.2.2", self.process_request_and_get_resulting_remote_addr(
             REMOTE_ADDR="1.0.1.1",
             HTTP_X_FORWARDED_FOR="2.2.2.2, 3.3.3.3"
         ))
 
+    @override_settings(TRUSTED_PROXY_IPS=["2.0/16"])
     def test_x_forwarded_for_header_does_not_override_remote_addr_when_not_among_trusted_proxy_ips__iprange(self):
-        settings.TRUSTED_PROXY_IPS = ["2.0/16"]
         self.assertEquals("1.1.1.1", self.process_request_and_get_resulting_remote_addr(
             REMOTE_ADDR="1.1.1.1",
             HTTP_X_FORWARDED_FOR="4.4.4.4",
         ))
 
+    @override_settings(TRUSTED_PROXY_IPS=["2.0/16", "1.0/16"])
     def test_x_forwarded_for_header_override_remote_addr__multiple_ips_in_header__multiple_trusted_ipranges(self):
-        settings.TRUSTED_PROXY_IPS = ["2.0/16", "1.0/16"]
         self.assertEquals("2.2.2.2", self.process_request_and_get_resulting_remote_addr(
             REMOTE_ADDR="1.0.1.1",
             HTTP_X_FORWARDED_FOR="2.2.2.2",
         ))
 
+    @override_settings(TRUSTED_PROXY_IPS=["2.0/16", "1.0/16"])
     def test_x_forwarded_for_header_not_present_does_not_change_remote_addr(self):
-        settings.TRUSTED_PROXY_IPS = ["2.0/16", "1.0/16"]
         self.assertEquals("1.0.1.1", self.process_request_and_get_resulting_remote_addr(
             REMOTE_ADDR="1.0.1.1",
         ))
 
+    @override_settings(TRUSTED_PROXY_IPS=["1.0.1.1"])
     def test_x_forwarded_for_header_no_valid_ip__multiple(self):
-        settings.TRUSTED_PROXY_IPS = ["1.0.1.1"]
         self.assertEquals("2.2.2.2", self.process_request_and_get_resulting_remote_addr(
             REMOTE_ADDR="1.0.1.1",
             HTTP_X_FORWARDED_FOR="unknown, 2.2.2.2",
