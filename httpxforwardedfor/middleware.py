@@ -4,29 +4,37 @@ from IPy import IP, parseAddress
 from django.conf import settings
 
 
-def is_valid_ip(ip):
-    try:
-        parseAddress(ip)
-        return True
-    except ValueError:
-        return False
-
-
 class HttpXForwardedForMiddleware(object):
 
     def __init__(self):
-        self.trusted_ip_ranges = map(IP, settings.TRUSTED_PROXY_IPS)
+        self.TRUSTED_PROXY_IP_RANGES = map(IP, settings.TRUSTED_PROXY_IPS)
 
     def process_request(self, request):
-        if "HTTP_X_FORWARDED_FOR" in request.META:
-            self._process_x_forwarded_for(request)
+        if "HTTP_X_FORWARDED_FOR" not in request.META:
+            return  # No HTTP_X_FORWARDED_FOR header, nothimng to do
+        if not self._request_via_trusted_proxy(request):
+            return  # We don't accept HTTP_X_FORWARDED_FOR from other proxies
+        client_ips = self._get_valid_client_ip_addresses(request)
+        if not client_ips:
+            return  # No valid IP left
+        request.META['REMOTE_ADDR'] = client_ips[0]
 
-    def _process_x_forwarded_for(self, request):
-        client_ips = request.META['HTTP_X_FORWARDED_FOR']
-        proxy_ip = IP(request.META["REMOTE_ADDR"])
+    def _request_via_trusted_proxy(self, request):
+        """Check, if the IP in REMPTE_ADDR belongs to a trusted proxy"""
+        remote_addr = IP(request.META["REMOTE_ADDR"])
+        return any(remote_addr in trusted_ip_range
+                   for trusted_ip_range in self.TRUSTED_PROXY_IP_RANGES)
 
-        if any(proxy_ip in trusted_ip_range for trusted_ip_range in self.trusted_ip_ranges):
-            # client's IP will be the first valid one.
-            client_ips = map(lambda i: i.strip(), client_ips.split(","))
-            request.META['REMOTE_ADDR'] = filter(is_valid_ip, client_ips)[0]
-        return
+    def _get_valid_client_ip_addresses(self, request):
+        """Get all valid IP addresses from the HTTP_X_FORWARDED_FOR header"""
+
+        def _is_valid_ip(ip):
+            """Check for valid IP address"""
+            try:
+                parseAddress(ip)
+                return True
+            except ValueError:
+                return False
+
+        client_ips = request.META['HTTP_X_FORWARDED_FOR'].split(",")
+        return [s.strip() for s in client_ips if _is_valid_ip(s.strip())]
