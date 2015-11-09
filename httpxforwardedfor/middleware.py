@@ -12,7 +12,7 @@ def is_valid_ip(ip):
         return False
 
 
-class XForwardedMiddleware(object):
+class HttpXForwardedForMiddleware(object):
 
     def __init__(self):
         self.trusted_ip_ranges = map(IP, settings.TRUSTED_PROXY_IPS)

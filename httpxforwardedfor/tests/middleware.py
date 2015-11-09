@@ -5,7 +5,7 @@ from django.conf import settings
 from django.http import HttpRequest
 from django.test.client import Client
 
-from paessler.httpxforwardedfor.middleware import XForwardedMiddleware
+from paessler.httpxforwardedfor.middleware import HttpXForwardedForMiddleware
 
 
 class MiddlewareTestCase(object):
@@ -117,7 +117,7 @@ class XForwardedMiddlewareTestCase(MiddlewareTestCase, unittest.TestCase):
         request, response = self.create_request_and_response()
 
         request.META.update(meta)
-        XForwardedMiddleware().process_request(request)
+        HttpXForwardedForMiddleware().process_request(request)
         return request.META["REMOTE_ADDR"]
 
     def create_request_and_response(self, data=None, path=None):
@@ -131,9 +131,9 @@ class XForwardedMiddlewareTestCase(MiddlewareTestCase, unittest.TestCase):
 class XForwardedForMiddlewareIntegrationTestCase(MiddlewareTestCase, unittest.TestCase):
 
     def test__middleware_is_installed(self):
-        middleware_name = "paessler.httpxforwardedfor.middleware.XForwardedMiddleware"
+        middleware_name = "paessler.httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
         self.assert_contains(settings.MIDDLEWARE_CLASSES, middleware_name)
 
     def test__middleware_is_installed_before_all_other_middlewares_that_use_remote_addr(self):
-        middleware_name = "paessler.httpxforwardedfor.middleware.XForwardedMiddleware"
+        middleware_name = "paessler.httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
         self.assertEquals(1, settings.MIDDLEWARE_CLASSES.index(middleware_name))
