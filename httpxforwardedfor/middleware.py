@@ -17,7 +17,7 @@ class HttpXForwardedForMiddleware(object):
         client_ips = self._get_valid_client_ip_addresses(request)
         if not client_ips:
             return  # No valid IP left
-        request.META['REMOTE_ADDR'] = client_ips[0]
+        request.META['REMOTE_ADDR'] = client_ips.pop()
 
     def _request_via_trusted_proxy(self, request):
         """Check, if the IP in REMPTE_ADDR belongs to a trusted proxy"""

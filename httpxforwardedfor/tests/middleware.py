@@ -19,7 +19,7 @@ class HttpXForwardedForMiddlewareTestScenarios(object):
     def test_header_overrides_remote_addr_for_trusted_proxy_ip__multiple_ips_in_header(self):
         request = self.create_request(REMOTE_ADDR="1.1.1.1",
                                       HTTP_X_FORWARDED_FOR="2.2.2.2, 3.3.3.3")
-        self.assert_remote_addr_is("2.2.2.2", request)
+        self.assert_remote_addr_is("3.3.3.3", request)
 
     def test_header_overrides_remote_addr_for_trusted_proxy_ip__multiple_ips_with_invalid_string_in_header(self):
         request = self.create_request(REMOTE_ADDR="1.1.1.1",
