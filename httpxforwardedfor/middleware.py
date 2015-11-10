@@ -11,13 +11,13 @@ class HttpXForwardedForMiddleware(object):
 
     def process_request(self, request):
         if "HTTP_X_FORWARDED_FOR" not in request.META:
-            return  # No HTTP_X_FORWARDED_FOR header, nothimng to do
+            return  # No HTTP_X_FORWARDED_FOR header, nothing to do
         if not self._request_via_trusted_proxy(request):
             return  # We don't accept HTTP_X_FORWARDED_FOR from other proxies
         client_ips = self._get_valid_client_ip_addresses(request)
         if not client_ips:
             return  # No valid IP left
-        request.META['REMOTE_ADDR'] = client_ips.pop()
+        request.META["REMOTE_ADDR"] = client_ips.pop()
 
     def _request_via_trusted_proxy(self, request):
         """Check, if the IP in REMPTE_ADDR belongs to a trusted proxy"""
@@ -36,5 +36,5 @@ class HttpXForwardedForMiddleware(object):
             except ValueError:
                 return False
 
-        client_ips = request.META['HTTP_X_FORWARDED_FOR'].split(",")
+        client_ips = request.META["HTTP_X_FORWARDED_FOR"].split(",")
         return [s.strip() for s in client_ips if _is_valid_ip(s.strip())]

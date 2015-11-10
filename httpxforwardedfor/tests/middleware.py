@@ -52,8 +52,8 @@ class HttpXForwardedForMiddlewareTestScenarios(object):
         path = path or "/"
         request = HttpRequest()
         request.META = {
-            'SERVER_NAME': 'testserver',
-            'SERVER_PORT': 80,
+            "SERVER_NAME": "testserver",
+            "SERVER_PORT": 80,
         }
         request.META.update(**meta)
         request.path = request.path_info = path
