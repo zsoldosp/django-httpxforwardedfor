@@ -13,65 +13,56 @@ class HttpXForwardedForMiddlewareTestCase(unittest.TestCase):
 
     @override_settings(TRUSTED_PROXY_IPS=["1.1.1.1"])
     def test_x_forwarded_for_header_overrides_remote_addr(self):
-        self.assertEquals("1.2.3.4", self.process_request_and_get_resulting_remote_addr(
-            REMOTE_ADDR="1.1.1.1",
-            HTTP_X_FORWARDED_FOR="1.2.3.4",
-        ))
+        request = self.create_request(REMOTE_ADDR="1.1.1.1",
+                                      HTTP_X_FORWARDED_FOR="1.2.3.4")
+        self.assert_remote_addr_is("1.2.3.4", request)
 
     @override_settings(TRUSTED_PROXY_IPS=["1.1.1.1"])
     def test_x_forwarded_for_header_overrides_remote_addr__multiple_ips_in_header(self):
-        self.assertEquals("2.2.2.2", self.process_request_and_get_resulting_remote_addr(
-            REMOTE_ADDR="1.1.1.1",
-            HTTP_X_FORWARDED_FOR="2.2.2.2, 3.3.3.3"
-        ))
+        request = self.create_request(REMOTE_ADDR="1.1.1.1",
+                                      HTTP_X_FORWARDED_FOR="2.2.2.2, 3.3.3.3")
+        self.assert_remote_addr_is("2.2.2.2", request)
 
     @override_settings(TRUSTED_PROXY_IPS=["2.2.2.2"])
     def test_x_forwarded_for_header_does_not_override_remote_addr_when_not_among_trusted_proxy_ips(self):
-        self.assertEquals("1.1.1.1", self.process_request_and_get_resulting_remote_addr(
-            REMOTE_ADDR="1.1.1.1",
-            HTTP_X_FORWARDED_FOR="4.4.4.4"
-        ))
+        request = self.create_request(REMOTE_ADDR="1.1.1.1",
+                                      HTTP_X_FORWARDED_FOR="4.4.4.4")
+        self.assert_remote_addr_is("1.1.1.1", request)
 
     @override_settings(TRUSTED_PROXY_IPS=["1.0/16"])
     def test_x_forwarded_for_header_overrides_remote_addr__iprange(self):
-        self.assertEquals("2.2.2.2", self.process_request_and_get_resulting_remote_addr(
-            REMOTE_ADDR="1.0.1.1",
-            HTTP_X_FORWARDED_FOR="2.2.2.2"
-        ))
+        request = self.create_request(REMOTE_ADDR="1.0.1.1",
+                                      HTTP_X_FORWARDED_FOR="2.2.2.2")
+        self.assert_remote_addr_is("2.2.2.2", request)
 
     @override_settings(TRUSTED_PROXY_IPS=["1.0/16"])
     def test_x_forwarded_for_header_overrides_remote_addr__multiple_ips_in_header__iprange(self):
-        self.assertEquals("2.2.2.2", self.process_request_and_get_resulting_remote_addr(
-            REMOTE_ADDR="1.0.1.1",
-            HTTP_X_FORWARDED_FOR="2.2.2.2, 3.3.3.3"
-        ))
+        request = self.create_request(REMOTE_ADDR="1.0.1.1",
+                                      HTTP_X_FORWARDED_FOR="2.2.2.2, 3.3.3.3")
+        self.assert_remote_addr_is("2.2.2.2", request)
 
     @override_settings(TRUSTED_PROXY_IPS=["2.0/16"])
     def test_x_forwarded_for_header_does_not_override_remote_addr_when_not_among_trusted_proxy_ips__iprange(self):
-        self.assertEquals("1.1.1.1", self.process_request_and_get_resulting_remote_addr(
-            REMOTE_ADDR="1.1.1.1",
-            HTTP_X_FORWARDED_FOR="4.4.4.4",
-        ))
+        request = self.create_request(REMOTE_ADDR="1.1.1.1",
+                                      HTTP_X_FORWARDED_FOR="4.4.4.4",)
+        self.assert_remote_addr_is("1.1.1.1", request)
 
     @override_settings(TRUSTED_PROXY_IPS=["2.0/16", "1.0/16"])
     def test_x_forwarded_for_header_override_remote_addr__multiple_ips_in_header__multiple_trusted_ipranges(self):
-        self.assertEquals("2.2.2.2", self.process_request_and_get_resulting_remote_addr(
-            REMOTE_ADDR="1.0.1.1",
-            HTTP_X_FORWARDED_FOR="2.2.2.2",
-        ))
+        request = self.create_request(REMOTE_ADDR="1.0.1.1",
+                                      HTTP_X_FORWARDED_FOR="2.2.2.2")
+        self.assert_remote_addr_is("2.2.2.2", request)
 
     @override_settings(TRUSTED_PROXY_IPS=["2.0/16", "1.0/16"])
     def test_x_forwarded_for_header_not_present_does_not_change_remote_addr(self):
-        self.assertEquals("1.0.1.1", self.process_request_and_get_resulting_remote_addr(
-            REMOTE_ADDR="1.0.1.1",
-        ))
+        request = self.create_request(REMOTE_ADDR="1.0.1.1")
+        self.assert_remote_addr_is("1.0.1.1", request)
 
     @override_settings(TRUSTED_PROXY_IPS=["1.0.1.1"])
     def test_x_forwarded_for_header_no_valid_ip__multiple(self):
-        self.assertEquals("2.2.2.2", self.process_request_and_get_resulting_remote_addr(
-            REMOTE_ADDR="1.0.1.1",
-            HTTP_X_FORWARDED_FOR="unknown, 2.2.2.2",
-        ))
+        request = self.create_request(REMOTE_ADDR="1.0.1.1",
+                                      HTTP_X_FORWARDED_FOR="unknown, 2.2.2.2")
+        self.assert_remote_addr_is("2.2.2.2", request)
 
     def test_x_forwarded_proto_is_recongnized_as_secure(self):
         request = self.create_request(HTTP_X_FORWARDED_PROTO="https")
@@ -83,10 +74,8 @@ class HttpXForwardedForMiddlewareTestCase(unittest.TestCase):
 
     #####
 
-    def process_request_and_get_resulting_remote_addr(self, **meta):
-        request = self.create_request(**meta)
-        HttpXForwardedForMiddleware().process_request(request)
-        return request.META["REMOTE_ADDR"]
+    def assert_remote_addr_is(self, expected, request):
+        self.assertEquals(expected, request.META["REMOTE_ADDR"])
 
     def create_request(self, path=None, **meta):
         path = path or "/"
@@ -97,6 +86,7 @@ class HttpXForwardedForMiddlewareTestCase(unittest.TestCase):
         }
         request.META.update(**meta)
         request.path = request.path_info = path
+        HttpXForwardedForMiddleware().process_request(request)
         return request
 
 
