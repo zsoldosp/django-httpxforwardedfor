@@ -112,11 +112,10 @@ class HttpXForwardedForMiddlewareTestCase(unittest.TestCase):
 
 
 class HttpXForwardedForMiddlewareIntegrationTestCase(unittest.TestCase):
+    MIDDLEWARE_NAME = "paessler.httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
 
     def test__middleware_is_installed(self):
-        middleware_name = "paessler.httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
-        assert_that(middleware_name, is_in(settings.MIDDLEWARE_CLASSES))
+        assert_that(self.MIDDLEWARE_NAME, is_in(settings.MIDDLEWARE_CLASSES))
 
     def test__middleware_is_installed_before_all_other_middlewares_that_use_remote_addr(self):
-        middleware_name = "paessler.httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
-        self.assertEquals(1, settings.MIDDLEWARE_CLASSES.index(middleware_name))
+        self.assertEquals(1, settings.MIDDLEWARE_CLASSES.index(self.MIDDLEWARE_NAME))
