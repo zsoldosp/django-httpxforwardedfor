@@ -3,7 +3,6 @@ from hamcrest import assert_that, is_in
 
 from django.conf import settings
 from django.http import HttpRequest
-from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils import unittest
 
@@ -75,38 +74,28 @@ class HttpXForwardedForMiddlewareTestCase(unittest.TestCase):
         ))
 
     def test_x_forwarded_proto_is_recongnized_as_secure(self):
-        request, response = self.create_request_and_response()
-        request.META.update(dict(HTTP_X_FORWARDED_PROTO="https"))
-
+        request = self.create_request(HTTP_X_FORWARDED_PROTO="https")
         self.assertTrue(request.is_secure())
 
     def test_x_forwarded_proto_does_nothing_if_not_provided(self):
-        request, response = self.create_request_and_response()
+        request = self.create_request()
         self.assertFalse(request.is_secure())
 
     #####
 
     def process_request_and_get_resulting_remote_addr(self, **meta):
-        request, response = self.create_request_and_response()
-
-        request.META.update(meta)
+        request = self.create_request(**meta)
         HttpXForwardedForMiddleware().process_request(request)
         return request.META["REMOTE_ADDR"]
 
-    def create_request_and_response(self, data=None, path=None, client=None):
-        client = client or Client()
+    def create_request(self, path=None, **meta):
         path = path or "/"
-        data = data or dict()
-        request = self._create_request(path)
-        response = client.get(path, data=data)
-        return request, response
-
-    def _create_request(self, path):
         request = HttpRequest()
         request.META = {
             'SERVER_NAME': 'testserver',
             'SERVER_PORT': 80,
         }
+        request.META.update(**meta)
         request.path = request.path_info = path
         return request
 
