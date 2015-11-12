@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-from hamcrest import assert_that, is_in
-
 from django.conf import settings
 from django.http import HttpRequest
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
-from paessler.httpxforwardedfor.middleware import HttpXForwardedForMiddleware
+from httpxforwardedfor.middleware import HttpXForwardedForMiddleware
 
 
 class HttpXForwardedForMiddlewareTestScenarios(object):
+    MIDDLEWARE_NAME = "httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
+
+    def setUp(self):
+        super(HttpXForwardedForMiddlewareTestScenarios, self).setUpClass()
+        self.assertIn(self.MIDDLEWARE_NAME, settings.MIDDLEWARE_CLASSES)
 
     def test_header_overrides_remote_addr_for_trusted_proxy_ip__single_ip_in_header(self):
         request = self.create_request(REMOTE_ADDR="1.1.1.1",
@@ -83,13 +86,3 @@ class SingleTrustedProxyIpRangeTestCase(HttpXForwardedForMiddlewareTestScenarios
 class MultipleTrustedProxyIpRangeTestCase(HttpXForwardedForMiddlewareTestScenarios,
                                           SimpleTestCase):
     pass
-
-
-class HttpXForwardedForMiddlewareIntegrationTestCase(SimpleTestCase):
-    MIDDLEWARE_NAME = "paessler.httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
-
-    def test__middleware_is_installed(self):
-        assert_that(self.MIDDLEWARE_NAME, is_in(settings.MIDDLEWARE_CLASSES))
-
-    def test__middleware_is_installed_before_all_other_middlewares_that_use_remote_addr(self):
-        self.assertEquals(1, settings.MIDDLEWARE_CLASSES.index(self.MIDDLEWARE_NAME))

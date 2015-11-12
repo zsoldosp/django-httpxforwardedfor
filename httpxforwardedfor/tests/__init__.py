@@ -1,1 +1,1 @@
-from paessler.httpxforwardedfor.tests.middleware import *  # noqa
+from httpxforwardedfor.tests.middleware import *  # noqa
