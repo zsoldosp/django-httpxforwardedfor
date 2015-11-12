@@ -18,4 +18,8 @@ INSTALLED_APPS = (
     'httpxforwardedfor',
 )
 
+MIDDLEWARE_CLASSES = [
+    'httpxforwardedfor.middleware.HttpXForwardedForMiddleware',
+]
+
 STATIC_URL = '/static/'
