@@ -18,4 +18,9 @@ INSTALLED_APPS = (
     'httpxforwardedfor',
 )
 
+MIDDLEWARE_CLASSES = [
+    'httpxforwardedfor.middleware.HttpXForwardedForMiddleware',
+]
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 STATIC_URL = '/static/'

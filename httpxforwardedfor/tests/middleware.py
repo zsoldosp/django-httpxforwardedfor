@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-from hamcrest import assert_that, is_in
-
 from django.conf import settings
 from django.http import HttpRequest
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
-from paessler.httpxforwardedfor.middleware import HttpXForwardedForMiddleware
+from httpxforwardedfor.middleware import HttpXForwardedForMiddleware
 
 
 class HttpXForwardedForMiddlewareTestScenarios(object):
+    MIDDLEWARE_NAME = "httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
+
+    def setUp(self):
+        super(HttpXForwardedForMiddlewareTestScenarios, self).setUpClass()
+        self.assertIn(self.MIDDLEWARE_NAME, settings.MIDDLEWARE_CLASSES)
 
     def test_header_overrides_remote_addr_for_trusted_proxy_ip__single_ip_in_header(self):
         request = self.create_request(REMOTE_ADDR="1.1.1.1",
@@ -31,6 +34,13 @@ class HttpXForwardedForMiddlewareTestScenarios(object):
                                       HTTP_X_FORWARDED_FOR="4.4.4.4")
         self.assert_remote_addr_is("9.9.9.9", request)
 
+    @override_settings(TRUST_ONLY_HTTPS_PROXY=True)
+    def test_header_does_not_override_remote_addr_for_untrusted_proxy_protocol(self):
+        request = self.create_request(REMOTE_ADDR="1.1.1.1",
+                                      HTTP_X_FORWARDED_FOR="3.3.3.3",
+                                      HTTP_X_FORWARDED_PROTO=None)
+        self.assert_remote_addr_is("1.1.1.1", request)
+
     def test_header_not_present_does_not_change_remote_addr(self):
         request = self.create_request(REMOTE_ADDR="1.0.1.1")
         self.assert_remote_addr_is("1.0.1.1", request)
@@ -40,7 +50,14 @@ class HttpXForwardedForMiddlewareTestScenarios(object):
         self.assertTrue(request.is_secure())
 
     def test_x_forwarded_proto_does_nothing_if_not_provided(self):
-        request = self.create_request()
+        request = self.create_request(HTTP_X_FORWARDED_PROTO=None)
+        self.assertFalse(request.is_secure())
+
+    def test_x_forwarded_proto_does_nothing_if_wrong_protocol(self):
+        self.assertEqual(settings.SECURE_PROXY_SSL_HEADER, ('HTTP_X_FORWARDED_PROTO', 'https'))
+        request = self.create_request(HTTP_X_FORWARDED_PROTO="ftp")
+        self.assertFalse(request.is_secure())
+        request = self.create_request(HTTP_X_FORWARDED_PROTO="http")
         self.assertFalse(request.is_secure())
 
     #####
@@ -48,13 +65,15 @@ class HttpXForwardedForMiddlewareTestScenarios(object):
     def assert_remote_addr_is(self, expected, request):
         self.assertEquals(expected, request.META["REMOTE_ADDR"])
 
-    def create_request(self, path=None, **meta):
+    def create_request(self, path=None, HTTP_X_FORWARDED_PROTO="https", **meta):
         path = path or "/"
         request = HttpRequest()
-        request.META = {
-            "SERVER_NAME": "testserver",
-            "SERVER_PORT": 80,
-        }
+        request.META = dict(
+            SERVER_NAME="testserver",
+            SERVER_PORT=80,
+        )
+        if HTTP_X_FORWARDED_PROTO is not None:
+            request.META.update(dict(HTTP_X_FORWARDED_PROTO=HTTP_X_FORWARDED_PROTO))
         request.META.update(**meta)
         request.path = request.path_info = path
         HttpXForwardedForMiddleware().process_request(request)
@@ -83,13 +102,3 @@ class SingleTrustedProxyIpRangeTestCase(HttpXForwardedForMiddlewareTestScenarios
 class MultipleTrustedProxyIpRangeTestCase(HttpXForwardedForMiddlewareTestScenarios,
                                           SimpleTestCase):
     pass
-
-
-class HttpXForwardedForMiddlewareIntegrationTestCase(SimpleTestCase):
-    MIDDLEWARE_NAME = "paessler.httpxforwardedfor.middleware.HttpXForwardedForMiddleware"
-
-    def test__middleware_is_installed(self):
-        assert_that(self.MIDDLEWARE_NAME, is_in(settings.MIDDLEWARE_CLASSES))
-
-    def test__middleware_is_installed_before_all_other_middlewares_that_use_remote_addr(self):
-        self.assertEquals(1, settings.MIDDLEWARE_CLASSES.index(self.MIDDLEWARE_NAME))
