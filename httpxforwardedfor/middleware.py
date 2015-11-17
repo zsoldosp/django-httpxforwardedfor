@@ -14,6 +14,8 @@ class HttpXForwardedForMiddleware(object):
             return  # No HTTP_X_FORWARDED_FOR header, nothing to do
         if not self._request_via_trusted_proxy(request):
             return  # We don't accept HTTP_X_FORWARDED_FOR from other proxies
+        if not self._request_is_secure(request):
+            return  # We only respect HTTP_X_FORWARDED_FOR via secure connections
         client_ips = self._get_valid_client_ip_addresses(request)
         if not client_ips:
             return  # No valid IP left
@@ -24,6 +26,13 @@ class HttpXForwardedForMiddleware(object):
         remote_addr = IP(request.META["REMOTE_ADDR"])
         return any(remote_addr in trusted_ip_range
                    for trusted_ip_range in self.TRUSTED_PROXY_IP_RANGES)
+
+    def _request_is_secure(self, request):
+        if request.is_secure():
+            return True
+        if not getattr(settings, 'TRUST_ONLY_HTTPS_PROXY', False):
+            return True  # Support existing behaviour.
+        return False
 
     def _get_valid_client_ip_addresses(self, request):
         """Get all valid IP addresses from the HTTP_X_FORWARDED_FOR header"""

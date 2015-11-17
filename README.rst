@@ -33,6 +33,10 @@ Then configure it in the settings of a project::
     # Only allow HTTP_X_FORWARDED_FOR, if the request is marked as secure.
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+    # To only allow change of the REMOTE_ADDR for requests via HTTPS.
+    # The default is to allow all requests.
+    TRUST_ONLY_HTTPS_PROXY=True
+
 Features
 --------
 

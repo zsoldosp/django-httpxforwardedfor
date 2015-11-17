@@ -34,6 +34,13 @@ class HttpXForwardedForMiddlewareTestScenarios(object):
                                       HTTP_X_FORWARDED_FOR="4.4.4.4")
         self.assert_remote_addr_is("9.9.9.9", request)
 
+    @override_settings(TRUST_ONLY_HTTPS_PROXY=True)
+    def test_header_does_not_override_remote_addr_for_untrusted_proxy_protocol(self):
+        request = self.create_request(REMOTE_ADDR="1.1.1.1",
+                                      HTTP_X_FORWARDED_FOR="3.3.3.3",
+                                      HTTP_X_FORWARDED_PROTO=None)
+        self.assert_remote_addr_is("1.1.1.1", request)
+
     def test_header_not_present_does_not_change_remote_addr(self):
         request = self.create_request(REMOTE_ADDR="1.0.1.1")
         self.assert_remote_addr_is("1.0.1.1", request)
@@ -43,7 +50,14 @@ class HttpXForwardedForMiddlewareTestScenarios(object):
         self.assertTrue(request.is_secure())
 
     def test_x_forwarded_proto_does_nothing_if_not_provided(self):
-        request = self.create_request()
+        request = self.create_request(HTTP_X_FORWARDED_PROTO=None)
+        self.assertFalse(request.is_secure())
+
+    def test_x_forwarded_proto_does_nothing_if_wrong_protocol(self):
+        self.assertEqual(settings.SECURE_PROXY_SSL_HEADER, ('HTTP_X_FORWARDED_PROTO', 'https'))
+        request = self.create_request(HTTP_X_FORWARDED_PROTO="ftp")
+        self.assertFalse(request.is_secure())
+        request = self.create_request(HTTP_X_FORWARDED_PROTO="http")
         self.assertFalse(request.is_secure())
 
     #####
@@ -51,13 +65,15 @@ class HttpXForwardedForMiddlewareTestScenarios(object):
     def assert_remote_addr_is(self, expected, request):
         self.assertEquals(expected, request.META["REMOTE_ADDR"])
 
-    def create_request(self, path=None, **meta):
+    def create_request(self, path=None, HTTP_X_FORWARDED_PROTO="https", **meta):
         path = path or "/"
         request = HttpRequest()
-        request.META = {
-            "SERVER_NAME": "testserver",
-            "SERVER_PORT": 80,
-        }
+        request.META = dict(
+            SERVER_NAME="testserver",
+            SERVER_PORT=80,
+        )
+        if HTTP_X_FORWARDED_PROTO is not None:
+            request.META.update(dict(HTTP_X_FORWARDED_PROTO=HTTP_X_FORWARDED_PROTO))
         request.META.update(**meta)
         request.path = request.path_info = path
         HttpXForwardedForMiddleware().process_request(request)
