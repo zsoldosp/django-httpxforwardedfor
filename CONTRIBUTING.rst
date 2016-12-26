@@ -13,7 +13,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://gitlab.bis/bis-team/django-httpxforwardedfor/issues.
+Report bugs at https://github.com/PaesslerAG/django-httpxforwardedfor/issues.
 
 If you are reporting a bug, please include:
 
@@ -43,7 +43,7 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://gitlab.bis/bis-team/django-httpxforwardedfor/issues.
+The best way to send feedback is to file an issue at https://github.com/PaesslerAG/django-httpxforwardedfor/issues.
 
 If you are proposing a feature:
 
@@ -60,7 +60,7 @@ Ready to contribute? Here's how to set up `django-httpxforwardedfor` for local d
 1. Fork the `django-httpxforwardedfor` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone gitlab.bis.com:your_name_here/django-httpxforwardedfor.git
+    $ git clone https://github.com/PaesslerAG/django-httpxforwardedfor.git
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
@@ -75,7 +75,7 @@ Ready to contribute? Here's how to set up `django-httpxforwardedfor` for local d
 Now you can make your changes locally.
 
 5. When you're done making changes, check that your changes pass flake8 and the
-tests, including testing other Python versions with tox::
+tests, including testing other Python versions with tox:
 
     $ flake8 httpxforwardedfor tests
     $ python setup.py test
@@ -101,7 +101,7 @@ Before you submit a pull request, check that it meets these guidelines:
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
 3. The pull request should work for Python 2.6, 2.7, and 3.3, and for PyPy. Check 
-   https:///bis-team/django-httpxforwardedfor/pull_requests
+   https://github.com/PaesslerAG/django-httpxforwardedfor/pulls
    and make sure that the tests pass for all supported Python versions.
 
 Tips
