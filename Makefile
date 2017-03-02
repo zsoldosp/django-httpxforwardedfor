@@ -51,7 +51,7 @@ docs:
 	$(MAKE) -C docs html
 	open docs/_build/html/index.html
 
-release: VERSION=$(shell python -c"import httpxforwardedfor as m; print m.__version__")
+release: VERSION=$(shell python -c"import httpxforwardedfor as m; print(m.__version__)")
 release: TAG:=v${VERSION}
 release: TAG_URL:=$(shell git remote -v | grep origin | sed "s/[\t ]\+/ /g" | cut -d' ' -f 2 | sort -u| sed "s/git@//" | sed "s/:/\//" | sed "s/\.git$$/\/tree\/${TAG}/")
 release: TAG_HTTP_STATUS:=$(shell wget ${TAG_URL} -O - --no-check-certificate 2>&1 | grep "200 OK" | wc -l)
