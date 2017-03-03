@@ -1,1 +1,1 @@
-from httpxforwardedfor.tests.middleware import *  # noqa
+from httpxforwardedfor.tests.test_middleware import *  # noqa

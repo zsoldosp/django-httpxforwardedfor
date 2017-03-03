@@ -2,7 +2,10 @@
 from django.conf import settings
 from django.http import HttpRequest
 from django.test import SimpleTestCase
-from django.test.utils import override_settings
+try:
+    from django.test import override_settings
+except ImportError:
+    from django.test.utils import override_settings
 
 from httpxforwardedfor.middleware import HttpXForwardedForMiddleware
 
