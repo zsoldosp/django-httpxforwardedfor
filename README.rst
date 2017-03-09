@@ -38,7 +38,7 @@ Release Notes
 
 * 0.1.2 - initial public release
 
-  * supports Django 1.5 to 1.10 on Python 2.7, 3.3, 3.4, and 3.5
+  * supports Django 1.8 to 1.10 on Python 2.7, 3.3, 3.4, and 3.5
   * configuration to activate forwarding of header only for safe requests and
     trusting only https requests in general.
 
