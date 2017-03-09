@@ -1,5 +1,5 @@
 .PHONY: clean-pyc clean-build docs clean-tox
-PYPI_SERVER?=http://pypi.ipx.bis/simple/
+PYPI_SERVER?=pypi
 SHELL=/bin/bash
 
 help:
