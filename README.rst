@@ -16,31 +16,19 @@ Quickstart
 
 Install django-httpxforwardedfor::
 
-    pip install httpxforwardedfor
+    pip install django-httpxforwardedfor
 
-Configure it in the settings of your django project::
+Then use it in a project::
 
-    # Make sure it is at the beginning of the list of middle-ware classes.
-    # Only other middle-ware classes working on the remote address should
-    # precede it.
-    MIDDLEWARE_CLASSES = [
-        'httpxforwardedfor.middleware.HttpXForwardedForMiddleware',
-    ] + MIDDLEWARE_CLASSES
-
-    # Only allow HTTP_X_FORWARDED_FOR, if the request is marked as secure.
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-    # To only allow change of the REMOTE_ADDR for requests via HTTPS.
-    # The default is to allow all requests.
-    TRUST_ONLY_HTTPS_PROXY=True
+    import httpxforwardedfor
 
 Release Notes
 -------------
 
-* 0.1.2 - initial public release
+* 0.1.0 - initial release (2017-04-12)
 
-  * supports Django 1.8 to 1.10 on Python 2.7, 3.3, 3.4, and 3.5
-  * configuration to activate forwarding of header only for safe requests and trusting only https requests in general.
+  * supports Django 1.8, 1.9, 1.10, 1.11 on python 2.7, 3.3, 3.4, 3.5, and 3.6 - as per the
+    `official django docs <https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django>`_
 
 
 .. contributing start
@@ -80,7 +68,7 @@ Setting up all Python versions
     sudo apt-get -y install software-properties-common
     sudo add-apt-repository ppa:fkrull/deadsnakes
     sudo apt-get update
-    for version in 3.3 3.5; do
+    for version in 3.3 3.5 3.6; do
       py=python$version
       sudo apt-get -y install ${py} ${py}-dev
     done

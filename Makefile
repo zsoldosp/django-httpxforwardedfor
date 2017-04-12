@@ -1,5 +1,5 @@
 .PHONY: clean-pyc clean-build docs clean-tox
-PYPI_SERVER?=pypi
+PYPI_SERVER?=https://pypi.com/
 GIT_REMOTE_NAME?=origin
 SHELL=/bin/bash
 VERSION=$(shell python -c"import httpxforwardedfor as m; print(m.__version__)")
@@ -9,7 +9,7 @@ help:
 	@echo "clean-pyc - remove Python file artifacts"
 	@echo "lint - check style with flake8"
 	@echo "test - run tests quickly with the default Python"
-	@echo "testall - run tests on every Python version with tox"
+	@echo "test-all - run tests on every Python version with tox"
 	@echo "coverage - check code coverage quickly with the default Python"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
 	@echo "tag - tag the current version and push it to ${GIT_REMOTE_NAME}"
@@ -32,7 +32,7 @@ lint:
 	flake8 httpxforwardedfor tests --max-complexity=10
 
 test:
-	python manage.py test httpxforwardedfor --traceback
+	python manage.py test testapp --traceback
 
 clean-tox:
 	if [[ -d .tox ]]; then rm -r .tox; fi
