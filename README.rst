@@ -34,9 +34,6 @@ Configure it in the settings of your django project::
     # The default is to allow all requests.
     TRUST_ONLY_HTTPS_PROXY = True
 
-Then use it in a project::
-
-    import httpxforwardedfor
 
 Release Notes
 -------------

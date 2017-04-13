@@ -19,7 +19,7 @@ readme = open('README.rst').read()
 description = "Set request.META['REMOTE_ADDR'] from request.META['HTTP_X_FORWARDED_FOR']"
 
 setup(
-    name='httpxforwardedfor',
+    name='django-httpxforwardedfor',
     version=version,
     description=description,
     long_description=readme,
@@ -32,6 +32,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'Django>=1.8,<=1.11',
+        'IPy'
     ],
     license="BSD",
     zip_safe=False,
