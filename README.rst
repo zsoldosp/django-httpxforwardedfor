@@ -38,7 +38,7 @@ Configure it in the settings of your django project::
 Release Notes
 -------------
 
-* 0.1.2 - initial release (2017-04-12)
+* 0.1.2 - initial release
 
   * supports Django 1.8, 1.9, 1.10, 1.11 on python 2.7, 3.3, 3.4, 3.5, and 3.6 - as per the
     `official django docs <https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django>`_
