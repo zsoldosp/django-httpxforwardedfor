@@ -1,44 +1,37 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import sys
 
-import httpxforwardedfor
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
-from setuptools import setup
+if sys.argv[-1] in ('publish', 'release'):
+    raise Exception('this is a test app, do not release it!')
 
-version = httpxforwardedfor.__version__
-
-if sys.argv[-1] == 'publish':
-    os.system('make release')
-    sys.exit()
-
-readme = open('README.rst').read()
-
-description = "Set request.META['REMOTE_ADDR'] from request.META['HTTP_X_FORWARDED_FOR']"
+readme = 'A simple test application to test httpxforwardedfor'
 
 setup(
-    name='django-httpxforwardedfor',
-    version=version,
-    description=description,
+    name='testapp',
+    version='0.0.0',
+    description=readme,
     long_description=readme,
     author='Paessler AG',
     author_email='bis@paessler.com',
     url='https://github.com/PaesslerAG/django-httpxforwardedfor',
     packages=[
-        'httpxforwardedfor',
+        'testapp',
     ],
     include_package_data=True,
     install_requires=[
-        'Django>=1.8,<=1.11',
-        'IPy'
     ],
     license="BSD",
     zip_safe=False,
     keywords='django-httpxforwardedfor',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
