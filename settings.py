@@ -8,7 +8,7 @@ DATABASES = {
     }
 }
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'httpxforwardedfor.middleware.HttpXForwardedForMiddleware',
 )
 

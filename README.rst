@@ -23,9 +23,9 @@ Configure it in the settings of your django project::
     # Make sure it is at the beginning of the list of middle-ware classes.
     # Only other middle-ware classes working on the remote address should
     # precede it.
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         'httpxforwardedfor.middleware.HttpXForwardedForMiddleware',
-    ] + MIDDLEWARE_CLASSES
+    ] + MIDDLEWARE
 
     # Only allow HTTP_X_FORWARDED_FOR, if the request is marked as secure.
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -37,6 +37,11 @@ Configure it in the settings of your django project::
 
 Release Notes
 -------------
+
+* 0.2.0 - futureproof release
+ 
+  * adapt to new middleware format of django 1.10+
+  * drop support for python 3.3, django < 1.10
 
 * 0.1.2 - initial release
 

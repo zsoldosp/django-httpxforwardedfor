@@ -16,7 +16,7 @@ class HttpXForwardedForMiddlewareTestScenarios(object):
 
     def setUp(self):
         super(HttpXForwardedForMiddlewareTestScenarios, self).setUpClass()
-        self.assertIn(self.MIDDLEWARE_NAME, settings.MIDDLEWARE_CLASSES)
+        self.assertIn(self.MIDDLEWARE_NAME, settings.MIDDLEWARE)
 
     def test_header_overrides_remote_addr_for_trusted_proxy_ip__single_ip_in_header(self):  # noqa: E501
         request = self.create_request(REMOTE_ADDR="1.1.1.1",
