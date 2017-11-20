@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.http import HttpRequest
 from django.test import SimpleTestCase
