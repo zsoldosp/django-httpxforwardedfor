@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from IPy import IP, parseAddress
 
 from django.conf import settings
@@ -6,8 +5,15 @@ from django.conf import settings
 
 class HttpXForwardedForMiddleware(object):
 
-    def __init__(self):
+    def __init__(self, get_response):
+        self.get_response = get_response
         self.TRUSTED_PROXY_IP_RANGES = map(IP, settings.TRUSTED_PROXY_IPS)
+
+    def __call__(self, request):
+        self.process_request(request)
+        response = self.get_response(request)
+        return response
+
 
     def process_request(self, request):
         if "HTTP_X_FORWARDED_FOR" not in request.META:
