@@ -8,7 +8,7 @@ DATABASES = {
     }
 }
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'httpxforwardedfor.middleware.HttpXForwardedForMiddleware',
 )
 
@@ -30,3 +30,5 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # To only allow change of the REMOTE_ADDR for requests via HTTPS.
 # The default is to allow all requests.
 TRUST_ONLY_HTTPS_PROXY = True
+
+ROOT_URLCONF = "tests.testapp.urls"
