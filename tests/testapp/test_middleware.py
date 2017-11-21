@@ -1,12 +1,5 @@
 from django.conf import settings
-from django.http import HttpRequest
-from django.test import SimpleTestCase
-try:
-    from django.test import override_settings
-except ImportError:
-    from django.test.utils import override_settings
-
-from httpxforwardedfor.middleware import HttpXForwardedForMiddleware
+from django.test import Client, override_settings, SimpleTestCase
 
 
 class HttpXForwardedForMiddlewareTestScenarios(object):
@@ -67,26 +60,17 @@ class HttpXForwardedForMiddlewareTestScenarios(object):
         request = self.create_request(HTTP_X_FORWARDED_PROTO="http")
         self.assertFalse(request.is_secure())
 
-    #####
-
     def assert_remote_addr_is(self, expected, request):
         self.assertEquals(expected, request.META["REMOTE_ADDR"])
 
-    def create_request(self, path=None,
-                       HTTP_X_FORWARDED_PROTO="https", **meta):
-        path = path or "/"
-        request = HttpRequest()
-        request.META = dict(
-            SERVER_NAME="testserver",
-            SERVER_PORT=80,
-        )
-        if HTTP_X_FORWARDED_PROTO is not None:
-            request.META.update(dict(
-                HTTP_X_FORWARDED_PROTO=HTTP_X_FORWARDED_PROTO))
-        request.META.update(**meta)
-        request.path = request.path_info = path
-        HttpXForwardedForMiddleware().process_request(request)
-        return request
+    def create_request(self, **header_kwargs):
+        header = {"HTTP_X_FORWARDED_PROTO": "https",
+                  "SERVER_NAME": "testserver",
+                  "SERVER_PORT": 80}
+
+        header.update(header_kwargs)
+        response = Client(**header).get("/")
+        return response.wsgi_request
 
 
 @override_settings(TRUSTED_PROXY_IPS=["1.1.1.1"])
