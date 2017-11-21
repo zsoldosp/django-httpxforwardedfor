@@ -1,5 +1,4 @@
 from IPy import IP, parseAddress
-
 from django.conf import settings
 
 
@@ -10,22 +9,24 @@ class HttpXForwardedForMiddleware(object):
         self.TRUSTED_PROXY_IP_RANGES = map(IP, settings.TRUSTED_PROXY_IPS)
 
     def __call__(self, request):
-        self.process_request(request)
+        request = self.process_request(request)
         response = self.get_response(request)
         return response
 
-
     def process_request(self, request):
         if "HTTP_X_FORWARDED_FOR" not in request.META:
-            return  # No HTTP_X_FORWARDED_FOR header, nothing to do
+            return request  # No HTTP_X_FORWARDED_FOR header, nothing to do
         if not self._request_via_trusted_proxy(request):
-            return  # We don't accept HTTP_X_FORWARDED_FOR from other proxies
+            # We don't accept HTTP_X_FORWARDED_FOR from other proxies
+            return request
         if not self._request_is_secure(request):
-            return  # We only respect HTTP_X_FORWARDED_FOR via secure connections  # noqa: E501
+            # We only respect HTTP_X_FORWARDED_FOR via secure connections
+            return request
         client_ips = self._get_valid_client_ip_addresses(request)
         if not client_ips:
-            return  # No valid IP left
+            return request  # No valid IP left
         request.META["REMOTE_ADDR"] = client_ips.pop()
+        return request
 
     def _request_via_trusted_proxy(self, request):
         """Check, if the IP in REMPTE_ADDR belongs to a trusted proxy"""
