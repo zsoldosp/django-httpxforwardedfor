@@ -43,6 +43,7 @@ Release Notes
   https://devguide.python.org/#status-of-python-branches
 
   * dropping support for Django 1.10 and Python 3.2 and 3.3
+  * adding support for Python 3.7
 
 * 0.2.0 - futureproof release
 
@@ -93,7 +94,7 @@ Setting up all Python versions
     sudo apt-get -y install software-properties-common
     sudo add-apt-repository ppa:fkrull/deadsnakes
     sudo apt-get update
-    for version in 3.4 3.5 3.6; do
+    for version in 3.4 3.5 3.6 3.7; do
       py=python$version
       sudo apt-get -y install ${py} ${py}-dev
     done
