@@ -31,7 +31,7 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
-        'Django>=1.10,<=1.11',
+        'Django>=1.11,<=2.1',
         'IPy'
     ],
     license="BSD",
