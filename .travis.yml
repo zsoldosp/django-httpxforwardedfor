@@ -10,7 +10,7 @@ matrix:
     - python: "2.7"
       env: TOX_ENVS=py27-django111
     - python: "3.4"
-      env: TOX_ENVS=py34-django111,py34-django20,py34-django21
+      env: TOX_ENVS=py34-django111,py34-django20
     - python: "3.6"
       env: TOX_ENVS=py36-django111,py36-django20,py36-django21
     - python: "3.7"
