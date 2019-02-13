@@ -35,6 +35,7 @@ class ToxToTravis:
 
     def setup_python(self):
         return [
+            'dist: xenial',
             'language: python',
             'before_install:',
             '  - sudo apt-get -qq update',
