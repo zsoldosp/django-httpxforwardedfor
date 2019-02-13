@@ -45,6 +45,7 @@ Release Notes
   * dropping support for Django 1.10 and Python 3.2 and 3.3
   * adding support for Python 3.7
   * adding support for Django 2.0
+  * adding support for Django 2.1
 
 * 0.2.0 - futureproof release
 
