@@ -38,8 +38,17 @@ Configure it in the settings of your django project::
 Release Notes
 -------------
 
+* 0.3.0 - update supported versions according to
+  https://www.djangoproject.com/download/#supported-versions and
+  https://devguide.python.org/#status-of-python-branches
+
+  * dropping support for Django 1.10 and Python 3.2 and 3.3
+  * adding support for Python 3.7
+  * adding support for Django 2.0
+  * adding support for Django 2.1
+
 * 0.2.0 - futureproof release
- 
+
   * adapt to new middleware format of django 1.10+
   * drop support for python 3.3, django < 1.10
 
@@ -87,7 +96,7 @@ Setting up all Python versions
     sudo apt-get -y install software-properties-common
     sudo add-apt-repository ppa:fkrull/deadsnakes
     sudo apt-get update
-    for version in 3.3 3.5 3.6; do
+    for version in 3.4 3.5 3.6 3.7; do
       py=python$version
       sudo apt-get -y install ${py} ${py}-dev
     done
