@@ -38,6 +38,8 @@ Configure it in the settings of your django project::
 Release Notes
 -------------
 
+* 0.3.1 - dropping support for Python 3.4 as it ran into EOL in March19
+
 * 0.3.0 - update supported versions according to
   https://www.djangoproject.com/download/#supported-versions and
   https://devguide.python.org/#status-of-python-branches
